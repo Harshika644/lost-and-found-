@@ -8,30 +8,37 @@
 <body class="bg-light">
   <div class="container py-5">
     <h2 class="mb-4 text-danger">📤 Report Lost Person</h2>
+
     <form method="POST" enctype="multipart/form-data" class="border p-4 bg-white rounded shadow">
       <div class="mb-3">
         <label class="form-label">Name</label>
-        <input type="text" name="name" class="form-control" required>
+        <input type="text" name="name" class="form-control" placeholder="Enter full name" required>
       </div>
+
       <div class="mb-3">
         <label class="form-label">Age</label>
-        <input type="number" name="age" class="form-control">
+        <input type="number" name="age" class="form-control" placeholder="Enter age">
       </div>
+
       <div class="mb-3">
         <label class="form-label">Last Seen Location</label>
-        <input type="text" name="location" class="form-control">
+        <input type="text" name="location" class="form-control" placeholder="Where was the person last seen?">
       </div>
+
       <div class="mb-3">
         <label class="form-label">Details</label>
-        <textarea name="details" class="form-control" rows="3"></textarea>
+        <textarea name="details" class="form-control" rows="3" placeholder="Clothing, time, other info..."></textarea>
       </div>
+
       <div class="mb-3">
         <label class="form-label">Photo</label>
-        <input type="file" name="photo" class="form-control" required>
+        <input type="file" name="photo" class="form-control" accept="image/*" required>
       </div>
+
       <button type="submit" class="btn btn-primary">Submit</button>
-      <a href="/" class="btn btn-secondary ms-2">Back</a>
+      <a href="/" class="btn btn-secondary ms-2">← Back</a>
     </form>
   </div>
 </body>
 </html>
+
