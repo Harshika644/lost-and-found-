@@ -3,7 +3,8 @@ import os
 import json
 from werkzeug.utils import secure_filename
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='templates', static_folder='static')
+
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 DATA_FILE = 'data.json'
 
