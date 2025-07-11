@@ -73,8 +73,10 @@ def detail(person_id):
     person = next((p for p in people if p['id'] == person_id), None)
     return render_template('detail.html', person=person)
 
-# Run the app
-if __name__ == "__main__":
-    app.run(debug=True)
+# Run the appimport os
+
+port = int(os.environ.get("PORT", 5000))
+app.run(host='0.0.0.0', port=port, debug=True)
+
 
 
