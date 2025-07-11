@@ -45,8 +45,11 @@ def lost():
         photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         photo.save(photo_path)
 
+        # Generate a unique ID
+        new_id = max([p["id"] for p in people], default=-1) + 1
+
         new_person = {
-            "id": len(people),
+            "id": new_id,
             "name": request.form['name'],
             "age": request.form['age'],
             "location": request.form['location'],
@@ -57,7 +60,7 @@ def lost():
         people.append(new_person)
         save_people(people)
         return redirect(url_for('found'))
-    
+
     return render_template('lost_form.html')
 
 # Show all found people
@@ -73,10 +76,10 @@ def detail(person_id):
     person = next((p for p in people if p['id'] == person_id), None)
     return render_template('detail.html', person=person)
 
-# Run the appimport os
-
+# Run the app
 port = int(os.environ.get("PORT", 5000))
 app.run(host='0.0.0.0', port=port, debug=True)
+
 
 
 
