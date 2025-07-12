@@ -69,6 +69,12 @@ def found():
     people = load_people()
     return render_template('found.html', people=people)
 
+@app.route('/lostfound')
+def lostfound():
+    return render_template('index.html')  # change to another page if needed
+
+
+
 # Individual detail page
 @app.route('/detail/<int:person_id>')
 def detail(person_id):
