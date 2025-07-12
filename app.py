@@ -7,6 +7,7 @@ app = Flask(__name__)
 
 # Folder to store uploaded photos
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
+MAX_FILES = 50  # Limit the number of photos to keep
 
 # File to save data
 DATA_FILE = 'data.json'
@@ -19,6 +20,16 @@ if not os.path.exists(app.config['UPLOAD_FOLDER']):
 if not os.path.exists(DATA_FILE):
     with open(DATA_FILE, 'w') as f:
         json.dump([], f)
+
+# Clean up old files in uploads
+def cleanup_uploads():
+    files = sorted(
+        [os.path.join(app.config['UPLOAD_FOLDER'], f) for f in os.listdir(app.config['UPLOAD_FOLDER'])],
+        key=os.path.getctime
+    )
+    while len(files) > MAX_FILES:
+        os.remove(files[0])
+        files.pop(0)
 
 # Load people data from JSON
 def load_people():
@@ -45,6 +56,8 @@ def lost():
         photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         photo.save(photo_path)
 
+        cleanup_uploads()  # Clean older photos to avoid 507
+
         # Generate a unique ID
         new_id = max([p["id"] for p in people], default=-1) + 1
 
@@ -69,11 +82,10 @@ def found():
     people = load_people()
     return render_template('found.html', people=people)
 
+# Lost & Found hub page (optional routing)
 @app.route('/lostfound')
 def lostfound():
-    return render_template('index.html')  # change to another page if needed
-
-
+    return render_template('index.html')
 
 # Individual detail page
 @app.route('/detail/<int:person_id>')
@@ -85,6 +97,7 @@ def detail(person_id):
 # Run the app
 port = int(os.environ.get("PORT", 5000))
 app.run(host='0.0.0.0', port=port, debug=True)
+
 
 
 
