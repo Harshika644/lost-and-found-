@@ -1,11 +1,26 @@
 from flask import Flask, render_template, request, redirect, session, url_for
+import os
 import json
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = "secret123"
 
 # ==============================
-# Load users
+# Config
+# ==============================
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
+DATA_FILE = 'data.json'
+
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
+
+if not os.path.exists(DATA_FILE):
+    with open(DATA_FILE, 'w') as f:
+        json.dump([], f)
+
+# ==============================
+# Load & Save Users
 # ==============================
 def load_users():
     try:
@@ -14,12 +29,20 @@ def load_users():
     except:
         return []
 
-# ==============================
-# Save users
-# ==============================
 def save_users(users):
     with open("data.json", "w") as f:
         json.dump(users, f, indent=4)
+
+# ==============================
+# Load & Save People
+# ==============================
+def load_people():
+    with open(DATA_FILE, 'r') as f:
+        return json.load(f)
+
+def save_people(people):
+    with open(DATA_FILE, 'w') as f:
+        json.dump(people, f)
 
 # ==============================
 # Home
@@ -40,12 +63,10 @@ def register():
         email = request.form['email']
         password = request.form['password']
 
-        # check if user already exists
         for user in users:
             if user.get('email') == email:
-                return "⚠️ User already exists! Please login."
+                return "User already exists!"
 
-        # add new user
         users.append({
             "name": name,
             "email": email,
@@ -73,7 +94,6 @@ def login():
                 session['user'] = user.get('name')
                 return redirect('/')
 
-        # if login fails → go to register
         return redirect('/register')
 
     return render_template('login.html')
@@ -87,22 +107,62 @@ def logout():
     return redirect('/')
 
 # ==============================
-# Protected Routes
+# Protected Lost Form
 # ==============================
-@app.route('/lost')
+@app.route('/lost', methods=['GET', 'POST'])
 def lost():
     if 'user' not in session:
         return redirect('/login')
+
+    if request.method == 'POST':
+        people = load_people()
+
+        photo = request.files['photo']
+        filename = secure_filename(photo.filename)
+        photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        photo.save(photo_path)
+
+        new_id = max([p.get("id", 0) for p in people], default=0) + 1
+
+        new_person = {
+            "id": new_id,
+            "name": request.form['name'],
+            "age": request.form['age'],
+            "location": request.form['location'],
+            "details": request.form['details'],
+            "photo": '/' + photo_path.replace("\\", "/")
+        }
+
+        people.append(new_person)
+        save_people(people)
+
+        return redirect('/found')
+
     return render_template('lost_form.html')
 
+# ==============================
+# Protected Found Page
+# ==============================
 @app.route('/found')
 def found():
     if 'user' not in session:
         return redirect('/login')
-    return render_template('found.html')
+
+    people = load_people()
+    return render_template('found.html', people=people)
 
 # ==============================
-# Run App
+# Detail Page
+# ==============================
+@app.route('/detail/<int:person_id>')
+def detail(person_id):
+    people = load_people()
+    person = next((p for p in people if p['id'] == person_id), None)
+    return render_template('detail.html', person=person)
+
+# ==============================
+# Run App (Render FIX ✅)
 # ==============================
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host='0.0.0.0', port=port)
