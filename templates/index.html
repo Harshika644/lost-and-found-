@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Login</title>
+  <title>Lost & Found Portal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -13,9 +13,28 @@
       font-family: 'Segoe UI', sans-serif;
     }
 
-    .card {
+    .hero-box {
+      background: #ffffff;
+      padding: 60px 30px;
       border-radius: 12px;
-      box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+      max-width: 700px;
+      width: 100%;
+    }
+
+    .hero-title {
+      font-weight: 700;
+      font-size: 2.5rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1.2rem;
+      color: #6c757d;
+      margin-bottom: 30px;
+    }
+
+    .btn-lg {
+      width: 260px;
     }
   </style>
 </head>
@@ -23,30 +42,46 @@
 <body>
 
 <div class="container d-flex justify-content-center align-items-center min-vh-100">
-  <div class="card p-4" style="width: 400px;">
+  <div class="hero-box text-center">
 
-    <h3 class="text-center text-primary mb-3">🔐 Login</h3>
+    <h1 class="hero-title text-primary">🔍 Lost & Found Portal</h1>
 
-    <form method="POST">
-      <div class="mb-3">
-        <label>Email</label>
-        <input type="email" name="email" class="form-control" required>
-      </div>
-
-      <div class="mb-3">
-        <label>Password</label>
-        <input type="password" name="password" class="form-control" required>
-      </div>
-
-      <button type="submit" class="btn btn-primary w-100">
-        Login
-      </button>
-    </form>
-
-    <p class="text-center mt-3">
-      Don't have an account? 
-      <a href="/register">Register</a>
+    <p class="hero-subtitle">
+      Helping reunite people with their loved ones
     </p>
+
+    {% if session.get('user') %}
+
+    <!-- ✅ After login -->
+    <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+      <a href="/lost" class="btn btn-danger btn-lg">
+        📤 Report Missing Person
+      </a>
+
+      <a href="/found" class="btn btn-success btn-lg">
+        ✅ View Missing People
+      </a>
+    </div>
+
+    <br>
+    <a href="/logout" class="btn btn-outline-dark">Logout</a>
+
+    {% else %}
+
+    <!-- 🔐 Before login -->
+    <p class="text-muted mb-4">Please login to continue</p>
+
+    <a href="/login" class="btn btn-primary btn-lg">
+      🔐 Login
+    </a>
+
+    <br><br>
+
+    <a href="/register" class="text-decoration-none">
+      New user? Register here
+    </a>
+
+    {% endif %}
 
   </div>
 </div>
