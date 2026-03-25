@@ -37,12 +37,15 @@ def save_users(users):
 # Load & Save People
 # ==============================
 def load_people():
-    with open(DATA_FILE, 'r') as f:
-        return json.load(f)
+    try:
+        with open(DATA_FILE, 'r') as f:
+            return json.load(f)
+    except:
+        return []
 
 def save_people(people):
     with open(DATA_FILE, 'w') as f:
-        json.dump(people, f)
+        json.dump(people, f, indent=4)
 
 # ==============================
 # Home
