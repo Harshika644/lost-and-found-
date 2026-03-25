@@ -18,7 +18,7 @@
             <img src="{{ person.photo }}" class="card-img-top" alt="{{ person.name }}" style="height: 300px; object-fit: cover;">
             <div class="card-body text-center">
               <h5 class="card-title">{{ person.name }}</h5>
-              <a href="{{ url_for('detail', person_id=person.id) }}" class="btn btn-outline-primary btn-sm">View Details</a>
+              <a href="{{ url_for('detail', person_id=person['id']) }}" class="btn btn-outline-primary btn-sm">
             </div>
           </div>
         </div>
