@@ -15,9 +15,9 @@ UPLOAD_FOLDER = 'static/uploads'
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Create folders/files if not exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# create files if not exist
 for file in [USER_FILE, PEOPLE_FILE]:
     if not os.path.exists(file):
         with open(file, 'w') as f:
@@ -115,7 +115,7 @@ def logout():
     return redirect('/')
 
 # ------------------------------
-# LOST (ADD PERSON)
+# ADD PERSON
 # ------------------------------
 @app.route('/lost', methods=['GET', 'POST'])
 def lost():
@@ -149,7 +149,7 @@ def lost():
     return render_template('lost_form.html')
 
 # ------------------------------
-# FOUND PAGE
+# VIEW PEOPLE
 # ------------------------------
 @app.route('/found')
 def found():
@@ -169,7 +169,24 @@ def detail(person_id):
     return render_template('detail.html', person=person)
 
 # ------------------------------
-# RUN (Render compatible)
+# DELETE (NEW 🔥)
+# ------------------------------
+@app.route('/delete/<int:person_id>')
+def delete(person_id):
+    if 'user' not in session:
+        return redirect('/login')
+
+    people = load_people()
+
+    # remove person
+    people = [p for p in people if p['id'] != person_id]
+
+    save_people(people)
+
+    return redirect('/found')
+
+# ------------------------------
+# RUN
 # ------------------------------
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 10000))
