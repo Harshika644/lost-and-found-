@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, url_for
+from flask import Flask, render_template, request, redirect, session
 import os
 import json
 from werkzeug.utils import secure_filename
@@ -7,56 +7,61 @@ app = Flask(__name__)
 app.secret_key = "secret123"
 
 # ==============================
-# Config
+# FILE CONFIG
 # ==============================
-app.config['UPLOAD_FOLDER'] = 'static/uploads'
-DATA_FILE = 'data.json'
+USER_FILE = 'users.json'
+PEOPLE_FILE = 'people.json'
+UPLOAD_FOLDER = 'static/uploads'
 
-if not os.path.exists(app.config['UPLOAD_FOLDER']):
-    os.makedirs(app.config['UPLOAD_FOLDER'])
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-if not os.path.exists(DATA_FILE):
-    with open(DATA_FILE, 'w') as f:
-        json.dump([], f)
+# Create folders/files if not exist
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+for file in [USER_FILE, PEOPLE_FILE]:
+    if not os.path.exists(file):
+        with open(file, 'w') as f:
+            json.dump([], f)
 
 # ==============================
-# Load & Save Users
+# USER FUNCTIONS
 # ==============================
 def load_users():
     try:
-        with open("data.json", "r") as f:
+        with open(USER_FILE, "r") as f:
             return json.load(f)
     except:
         return []
 
 def save_users(users):
-    with open("data.json", "w") as f:
+    with open(USER_FILE, "w") as f:
         json.dump(users, f, indent=4)
 
 # ==============================
-# Load & Save People
+# PEOPLE FUNCTIONS
 # ==============================
 def load_people():
     try:
-        with open(DATA_FILE, 'r') as f:
+        with open(PEOPLE_FILE, "r") as f:
             return json.load(f)
     except:
         return []
 
 def save_people(people):
-    with open(DATA_FILE, 'w') as f:
+    with open(PEOPLE_FILE, "w") as f:
         json.dump(people, f, indent=4)
 
 # ==============================
-# Home
+# ROUTES
 # ==============================
+
 @app.route('/')
 def home():
     return render_template('index.html')
 
-# ==============================
-# Register
-# ==============================
+# ------------------------------
+# REGISTER
+# ------------------------------
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -81,9 +86,9 @@ def register():
 
     return render_template('register.html')
 
-# ==============================
-# Login
-# ==============================
+# ------------------------------
+# LOGIN
+# ------------------------------
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -101,17 +106,17 @@ def login():
 
     return render_template('login.html')
 
-# ==============================
-# Logout
-# ==============================
+# ------------------------------
+# LOGOUT
+# ------------------------------
 @app.route('/logout')
 def logout():
     session.pop('user', None)
     return redirect('/')
 
-# ==============================
-# Protected Lost Form
-# ==============================
+# ------------------------------
+# LOST (ADD PERSON)
+# ------------------------------
 @app.route('/lost', methods=['GET', 'POST'])
 def lost():
     if 'user' not in session:
@@ -122,8 +127,8 @@ def lost():
 
         photo = request.files['photo']
         filename = secure_filename(photo.filename)
-        photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        photo.save(photo_path)
+        path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        photo.save(path)
 
         new_id = max([p.get("id", 0) for p in people], default=0) + 1
 
@@ -133,7 +138,7 @@ def lost():
             "age": request.form['age'],
             "location": request.form['location'],
             "details": request.form['details'],
-            "photo": '/' + photo_path.replace("\\", "/")
+            "photo": '/' + path.replace("\\", "/")
         }
 
         people.append(new_person)
@@ -143,9 +148,9 @@ def lost():
 
     return render_template('lost_form.html')
 
-# ==============================
-# Protected Found Page
-# ==============================
+# ------------------------------
+# FOUND PAGE
+# ------------------------------
 @app.route('/found')
 def found():
     if 'user' not in session:
@@ -154,18 +159,18 @@ def found():
     people = load_people()
     return render_template('found.html', people=people)
 
-# ==============================
-# Detail Page
-# ==============================
+# ------------------------------
+# DETAIL PAGE
+# ------------------------------
 @app.route('/detail/<int:person_id>')
 def detail(person_id):
     people = load_people()
     person = next((p for p in people if p['id'] == person_id), None)
     return render_template('detail.html', person=person)
 
-# ==============================
-# Run App (Render FIX ✅)
-# ==============================
+# ------------------------------
+# RUN (Render compatible)
+# ------------------------------
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
