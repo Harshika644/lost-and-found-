@@ -37,6 +37,18 @@
                class="btn btn-outline-primary btn-sm">
                View Details
             </a>
+            <a href="{{ url_for('detail', person_id=person['id']) }}" 
+   class="btn btn-outline-primary btn-sm">
+   View Details
+</a>
+
+<br><br>
+
+<a href="{{ url_for('delete', person_id=person['id']) }}" 
+   onclick="return confirm('Are you sure you want to delete?')"
+   class="btn btn-danger btn-sm">
+   🗑 Delete
+</a>
 
           </div>
         </div>
